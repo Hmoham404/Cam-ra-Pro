@@ -1,0 +1,9 @@
+node_modules/
+.next/
+out/
+public/ocr/
+public/pdf/
+.playwright/
+test-results/
+playwright-report/
+*.tsbuildinfo

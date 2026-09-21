@@ -1,0 +1,54 @@
+@import "tailwindcss";
+@import "@fontsource-variable/manrope";
+@theme {
+  --font-sans: "Manrope Variable", sans-serif;
+  --color-ink: #17263c;
+  --color-muted: #7a8596;
+  --color-brand: #2563eb;
+}
+@layer base {
+  body {
+    @apply bg-[#f6f8fb] text-ink text-sm antialiased;
+  }
+  button,
+  a,
+  input,
+  select,
+  textarea {
+    @apply outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2;
+  }
+  button {
+    @apply cursor-pointer disabled:cursor-not-allowed disabled:opacity-40;
+  }
+  input,
+  select,
+  textarea {
+    @apply min-w-0 max-sm:!text-base;
+  }
+  ::selection {
+    @apply bg-blue-100 text-blue-900;
+  }
+}
+@layer components {
+  .panel {
+    @apply rounded-2xl border border-slate-200/80 bg-white shadow-[0_3px_16px_-10px_#16243c22];
+  }
+  .field {
+    @apply w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-[13px] text-ink placeholder:text-slate-300 transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100;
+  }
+  .label {
+    @apply mb-1.5 block text-[11px] font-semibold text-slate-500;
+  }
+  .btn {
+    @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-lg px-4 text-xs font-bold transition duration-200 active:scale-[0.98];
+  }
+  .btn-primary {
+    @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-brand px-5 text-xs font-bold text-white shadow-[0_4px_10px_#2563eb20] transition hover:bg-blue-700 disabled:shadow-none;
+  }
+  .btn-secondary {
+    @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 text-xs font-bold text-slate-600 transition hover:border-slate-300 hover:bg-slate-50;
+  }
+  .icon-btn {
+    @apply inline-flex size-9 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-100 hover:text-blue-600;
+  }
+}
