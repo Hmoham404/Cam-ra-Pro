@@ -58,8 +58,8 @@ export default function Guide() {
             autres restent visibles dans la photo originale.
           </li>
           <li>
-            La première analyse charge le moteur OCR. Sur mobile, elle peut
-            prendre plusieurs dizaines de secondes.
+            La première analyse charge le moteur. Sur mobile, elle peut prendre
+            plusieurs dizaines de secondes.
           </li>
           <li>
             Le taux de rebut est calculé à partir de NOK / quantité totale ×

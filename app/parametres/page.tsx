@@ -96,11 +96,11 @@ export default function Settings() {
           </h2>
           <div className="space-y-5 text-xs leading-6 text-slate-500">
             <p>
-              L’analyse OCR et la génération des PDF se font dans votre
-              navigateur. Votre image n’est jamais envoyée à un serveur.
+              L’analyse et la génération des PDF se font dans votre navigateur.
+              Votre image n’est jamais envoyée à un serveur.
             </p>
             <p>
-              L’application charge ses fichiers, son moteur OCR et les langues
+              L’application charge ses fichiers, son moteur et les langues
               depuis son hébergement. Les images restent en mémoire sur votre
               appareil.
             </p>

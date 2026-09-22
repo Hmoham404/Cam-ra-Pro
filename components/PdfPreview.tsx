@@ -193,8 +193,8 @@ export function PdfPreview({
           </div>
           {!fullscreen && <PdfCanvasViewer blob={pdf.blob} />}
           <p className="mt-3 text-[11px] leading-5 text-slate-500">
-            Rapport OCR automatique : vérifiez le texte et les tableaux dans
-            l’aperçu. La photo originale est incluse.
+            Rapport automatique : verifiez les champs et tableaux dans l'aper�u.
+            La photo originale est incluse.
           </p>
         </div>
       )}

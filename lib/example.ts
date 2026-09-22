@@ -15,21 +15,21 @@ export async function createExample(): Promise<File> {
   ctx.font = "32px Arial";
   const lines = [
     "Date : 21/09/2026",
-    "Département : Injection",
+    "Departement : Injection",
     "Machine : INJ-04",
-    "Référence : CAP-245",
-    "N° OF : OF-260921-01",
-    "Équipe : A",
+    "Reference : CAP-245",
+    "N OF : OF-260921-01",
+    "Equipe : A",
   ];
   lines.forEach((line, i) => ctx.fillText(line, 100, 300 + i * 66));
   ctx.font = "bold 28px Arial";
   [
     ["Heure", 100],
-    ["Quantité", 350],
+    ["Quantite", 350],
     ["OK", 650],
     ["NOK", 850],
     ["Observation", 1050],
-  ].forEach(([t, x]) => ctx.fillText(String(t), Number(x), 790));
+  ].forEach(([text, x]) => ctx.fillText(String(text), Number(x), 790));
   ctx.font = "30px Arial";
   [
     ["08:00", "250", "240", "10", ""],
@@ -37,21 +37,25 @@ export async function createExample(): Promise<File> {
     ["12:00", "280", "270", "10", "Rayure"],
     ["14:00", "300", "295", "5", ""],
   ].forEach((row, i) => {
-    row.forEach((v, j) =>
-      ctx.fillText(v, [100, 350, 650, 850, 1050][j], 875 + i * 90),
+    row.forEach((value, j) =>
+      ctx.fillText(value, [100, 350, 650, 850, 1050][j], 875 + i * 90),
     );
   });
-  ctx.fillText("Défaut : Rayure", 100, 1370);
-  ctx.fillText("Observation : Contrôle visuel effectué", 100, 1440);
-  return new Promise((resolve, reject) =>
-    canvas.toBlob(
-      (blob) =>
-        blob
-          ? resolve(
-              new File([blob], "exemple-injection.png", { type: "image/png" }),
-            )
-          : reject(new Error("Impossible de créer l’exemple.")),
-      "image/png",
-    ),
-  );
+  ctx.fillText("Defaut : Rayure", 100, 1370);
+  ctx.fillText("Observation : Controle visuel effectue", 100, 1440);
+
+  const blob = await new Promise<Blob | null>((resolve) => {
+    const timeout = window.setTimeout(() => resolve(null), 1200);
+    canvas.toBlob((value) => {
+      window.clearTimeout(timeout);
+      resolve(value);
+    }, "image/png");
+  });
+  if (blob)
+    return new File([blob], "exemple-injection.png", { type: "image/png" });
+
+  const response = await fetch(canvas.toDataURL("image/png"));
+  return new File([await response.blob()], "exemple-injection.png", {
+    type: "image/png",
+  });
 }

@@ -112,6 +112,11 @@ try {
     !pdf.includes("superviseur"),
     "Auto report must not claim manual verification",
   );
+  assert.ok(
+    !pdf.includes("TRANSCRIPTION"),
+    "PDF must not include raw text dump",
+  );
+  assert.ok(!pdf.includes("OCR"), "PDF must hide OCR technical wording");
   await page.getByRole("button", { name: "Partager", exact: true }).click();
   await page
     .getByText(/Le partage de fichiers n’est pas disponible ici/)

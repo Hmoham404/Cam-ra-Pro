@@ -4,7 +4,7 @@ import { AppShell } from "@/components/AppShell";
 export const metadata: Metadata = {
   title: "Production Sheet Reader",
   description:
-    "De la fiche papier aux données. Lecture OCR, contrôle et PDF, entièrement sur votre appareil.",
+    "De la fiche papier aux données. Lecture, contrôle et PDF, entièrement sur votre appareil.",
 };
 export const viewport: Viewport = {
   width: "device-width",

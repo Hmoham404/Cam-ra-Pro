@@ -19,9 +19,11 @@ import { ImageUploader } from "./ImageUploader";
 import { ImageViewer } from "./ImageViewer";
 import { OcrProgress } from "./OcrProgress";
 import { PdfPreview, type PdfResult } from "./PdfPreview";
+import { ExtractedDataPanel } from "./ExtractedDataPanel";
 import {
   DEPARTMENTS,
   type Department,
+  type ProductionSheet,
   type SavedSheet,
   type SheetType,
 } from "@/types/production";
@@ -29,7 +31,7 @@ import { extractTextFromImage, type Progress } from "@/lib/ocr";
 import { parseProductionSheet } from "@/lib/parser";
 import { generatePdf } from "@/lib/pdf";
 import { saveSheet } from "@/lib/storage";
-import { scrapRate } from "@/lib/calculations";
+import { scrapRate, totals } from "@/lib/calculations";
 import { createExample } from "@/lib/example";
 import { loadImage } from "@/lib/imageProcessing";
 
@@ -44,6 +46,7 @@ export function Reader() {
     [error, setError] = useState(""),
     [notice, setNotice] = useState("");
   const [pdf, setPdf] = useState<PdfResult>(),
+    [extractedSheet, setExtractedSheet] = useState<ProductionSheet>(),
     [enhance, setEnhance] = useState(true);
   const controller = useRef<AbortController | null>(null),
     record = useRef<SavedSheet | null>(null),
@@ -76,6 +79,7 @@ export function Reader() {
   }, [pdf?.blob]);
   function clearReport() {
     setPdf(undefined);
+    setExtractedSheet(undefined);
     setProgress(undefined);
     setNotice("");
     setError("");
@@ -133,6 +137,7 @@ export function Reader() {
       const sheet = parseProductionSheet(text, department, sheetType);
       sheet.source_filename = file.name;
       sheet.department = department;
+      setExtractedSheet(sheet);
       const id = record.current?.id || crypto.randomUUID();
       const result = await generatePdf(sheet, sheetType, file, id);
       abort.signal.throwIfAborted();
@@ -170,6 +175,48 @@ export function Reader() {
       }
     } finally {
       if (!abort.signal.aborted) setBusy(false);
+    }
+  }
+  async function applyCorrections(sheet: ProductionSheet) {
+    if (!file || busy) return;
+    setBusy(true);
+    setError("");
+    setNotice("");
+    try {
+      const nextSheet = sheet.rows.length
+        ? { ...sheet, ...totals(sheet.rows) }
+        : sheet;
+      nextSheet.source_filename = file.name;
+      nextSheet.department = department;
+      const id = record.current?.id || crypto.randomUUID();
+      const result = await generatePdf(nextSheet, sheetType, file, id);
+      const saved: SavedSheet = {
+        ...nextSheet,
+        id,
+        sheetType,
+        filename: record.current?.filename || result.filename,
+        createdAt: result.createdAt,
+        pdf: result.blob,
+        scrapRate: scrapRate(nextSheet.quantity_nok, nextSheet.quantity),
+      };
+      record.current = saved;
+      await saveSheet(saved);
+      setExtractedSheet(nextSheet);
+      setPdf({ ...result, filename: saved.filename });
+      setProgress({
+        stage: "PDF mis a jour avec vos corrections",
+        percent: 100,
+      });
+      if (nextSheet.rows.some((row) => row.quantity !== row.ok + row.nok))
+        setNotice(
+          "Certaines lignes restent incoherentes: verifiez la quantite, OK et NOK.",
+        );
+    } catch (cause) {
+      setError(
+        `La mise a jour du PDF n'a pas abouti. ${(cause as Error).message}`,
+      );
+    } finally {
+      setBusy(false);
     }
   }
   async function rename(filename: string) {
@@ -336,6 +383,13 @@ export function Reader() {
         <div ref={report} className="min-w-0 scroll-mt-4">
           {pdf ? (
             <>
+              {extractedSheet && (
+                <ExtractedDataPanel
+                  sheet={extractedSheet}
+                  disabled={busy}
+                  onApply={applyCorrections}
+                />
+              )}
               <PdfPreview
                 key={pdf.createdAt}
                 pdf={pdf}

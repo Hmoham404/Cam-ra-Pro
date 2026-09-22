@@ -18,7 +18,7 @@ export function OcrProgress({ progress }: { progress: Progress }) {
       </div>
       <div
         role="progressbar"
-        aria-label="Progression OCR"
+        aria-label="Progression de la lecture"
         aria-valuenow={progress.percent}
         aria-valuemin={0}
         aria-valuemax={100}

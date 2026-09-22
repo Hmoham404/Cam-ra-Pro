@@ -17,6 +17,20 @@ test("preserves table headers and cells for regular OCR tables", () => {
     },
   ]);
 });
+test("reconstructs compact OCR production rows under a detected header", () => {
+  const tables = parseDocumentTables(
+    "Heure Quantite OK NOK Observation\n08:00 250 240 10\n10h00 300 290 10 Rayure",
+  );
+  assert.deepEqual(tables, [
+    {
+      headers: ["Heure", "Quantite", "OK", "NOK", "Observation"],
+      rows: [
+        ["08:00", "250", "240", "10", ""],
+        ["10:00", "300", "290", "10", "Rayure"],
+      ],
+    },
+  ]);
+});
 test("supports pipe tables, empty cells, multiple tables and separator lines", () => {
   const tables = parseDocumentTables(
     "| Produit | Quantité | Note |\n|---|---|---|\n| A | 20 | |\n| B | 30 | Rayure |\n\nHeure\tValeur\n08:00\t12\n09:00\t15",

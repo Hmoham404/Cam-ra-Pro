@@ -30,8 +30,13 @@ export function ImageViewer({
 }) {
   const [zoom, setZoom] = useState(1),
     [fullscreen, setFullscreen] = useState(false),
-    [drag, setDrag] = useState(false);
+    [drag, setDrag] = useState(false),
+    [ready, setReady] = useState(false);
   const input = useRef<HTMLInputElement>(null);
+  const locked = disabled || !ready;
+  useEffect(() => {
+    setReady(true);
+  }, []);
   useEffect(() => {
     setZoom(1);
   }, [url]);
@@ -88,7 +93,7 @@ export function ImageViewer({
           ].map(({ label, icon: Icon, action }) => (
             <button
               key={label}
-              disabled={!url || disabled}
+              disabled={!url || locked}
               className="icon-btn !size-8"
               title={label}
               aria-label={label}
@@ -111,13 +116,13 @@ export function ImageViewer({
       <div
         onDragOver={(e) => {
           e.preventDefault();
-          if (!disabled) setDrag(true);
+          if (!locked) setDrag(true);
         }}
         onDragLeave={() => setDrag(false)}
         onDrop={(e) => {
           e.preventDefault();
           setDrag(false);
-          if (!disabled && e.dataTransfer.files[0])
+          if (!locked && e.dataTransfer.files[0])
             onFile(e.dataTransfer.files[0]);
         }}
         className={`relative flex min-h-[300px] items-center justify-center overflow-auto rounded-xl border border-dashed p-6 ${fullscreen ? "flex-1" : "h-[328px]"} ${drag ? "border-blue-500 bg-blue-50" : "border-slate-200 bg-[#f8fafc]"}`}
@@ -151,7 +156,7 @@ export function ImageViewer({
             </p>
             <button
               onClick={() => input.current?.click()}
-              disabled={disabled}
+              disabled={locked}
               className="mt-3 min-h-10 text-[11px] font-bold text-blue-600 hover:text-blue-800"
             >
               Parcourir les fichiers <span className="ml-1">→</span>
@@ -168,13 +173,13 @@ export function ImageViewer({
         type="file"
         accept="image/jpeg,image/png,image/webp"
         onChange={(e) => {
-          if (e.target.files?.[0]) onFile(e.target.files[0]);
+          if (!locked && e.target.files?.[0]) onFile(e.target.files[0]);
           e.target.value = "";
         }}
       />
       {!url && (
         <button
-          disabled={disabled}
+          disabled={locked}
           onClick={onExample}
           className="mt-3 min-h-8 text-[10px] text-slate-400 hover:text-blue-600"
         >

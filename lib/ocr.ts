@@ -13,14 +13,14 @@ export async function extractTextFromImage(
   const image = await preprocessImage(file, rotation, enhance);
   signal?.throwIfAborted();
   const { createWorker } = await import("tesseract.js");
-  report("Chargement du moteur OCR", 12);
+  report("Chargement du moteur de lecture", 12);
   const worker = await createWorker("fra+eng", 1, {
     workerPath: "/ocr/worker.min.js",
     corePath: "/ocr",
     langPath: "/ocr",
     logger: (message) => {
       if (message.status === "recognizing text")
-        report("Lecture OCR", 20 + Math.round(message.progress * 68));
+        report("Lecture automatique", 20 + Math.round(message.progress * 68));
     },
   });
   const abort = () => {
