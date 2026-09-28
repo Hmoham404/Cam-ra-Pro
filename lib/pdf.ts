@@ -134,18 +134,33 @@ export async function generatePdf(
       margin: { left: 16, right: 16, bottom: 20 },
     });
 
-  if (!sheet.rows.length && !sheet.tables?.length && !quality.length)
-    autoTable(doc, {
-      startY: lastY() + 8,
-      body: [
-        [
-          "Aucune donnee structuree detectee. Consultez la photo originale ci-dessous.",
-        ],
-      ],
-      theme: "plain",
-      styles: { fontSize: 11, textColor: [180, 90, 20] },
-      margin: { left: 16, right: 16, bottom: 20 },
-    });
+  if (!sheet.rows.length && !sheet.tables?.length) {
+    if (sheet.extracted_text.trim()) {
+      autoTable(doc, {
+        startY: lastY() + 8,
+        head: [["TEXTE LU SUR LE DOCUMENT"]],
+        body: sheet.extracted_text.trim().split(/\r?\n/).map((line) => [line || " "]),
+        theme: "plain",
+        headStyles: { fontSize: 11, fontStyle: "bold", textColor: [17, 31, 53] },
+        styles: {
+          fontSize: 9,
+          textColor: [55, 65, 81],
+          cellPadding: 2,
+          overflow: "linebreak",
+          valign: "top",
+        },
+        margin: { left: 16, right: 16, bottom: 20 },
+      });
+    } else {
+      autoTable(doc, {
+        startY: lastY() + 8,
+        body: [["Aucun texte lisible detecte. Consultez la photo originale."]],
+        theme: "plain",
+        styles: { fontSize: 11, textColor: [180, 90, 20] },
+        margin: { left: 16, right: 16, bottom: 20 },
+      });
+    }
+  }
 
   if (image) {
     doc.addPage();

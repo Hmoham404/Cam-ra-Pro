@@ -1,6 +1,9 @@
 import type { DocumentTable } from "@/types/production";
 
-const hasLetters = (cell: string) => /[a-zA-Z\u00c0-\u024f]/.test(cell);
+// A table needs several readable column labels. OCR from web pages and product
+// screenshots often aligns prices, icons, and fragments into false tables.
+const hasMeaningfulHeaders = (cells: string[]) =>
+  cells.filter((cell) => /[a-zA-Z\u00c0-\u024f]{3,}/.test(cell)).length >= 3;
 
 const normalizeHeader = (cells: string[]) =>
   cells
@@ -57,7 +60,7 @@ export function parseDocumentTables(text: string): DocumentTable[] {
   const flush = () => {
     const width = group[0]?.length || 0;
     const rows = group.filter((row) => row.length === width);
-    if (rows.length >= 3 && rows[0].some(hasLetters)) {
+    if (rows.length >= 3 && hasMeaningfulHeaders(rows[0])) {
       tables.push({ headers: rows[0], rows: rows.slice(1) });
     }
     group = [];
